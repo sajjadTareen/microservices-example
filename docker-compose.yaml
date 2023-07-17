@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  inventory:
+    build: ./inventory-service
+    ports:
+      - 5002:5002
+  shipping:
+    build: ./shipping-service
+    ports:
+      - 5001:5001
+  users:
+    build: ./users-service
+    ports:
+      - 5007:5007
+  billing:
+    build: ./billing-service
+    ports:
+      - 5009:5009
