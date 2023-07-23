@@ -1,10 +1,21 @@
 // imports
 const express = require("express");
 const morgan = require("morgan");
+const amqp = require("amqplib");
 
 // init express app
-const app = express();
+let channel;
 
+async function connect() {
+  const amqpServer = process.env.RABBITMQ_URL;
+  const connection = await amqp.connect(amqpServer);
+  channel = await connection.createChannel();
+  await channel.assertQueue("SHIPPING");
+}
+
+connect();
+
+const app = express();
 // use morgan middleware
 app.use(morgan("combined"));
 app.use(express.json());
@@ -26,6 +37,8 @@ app.post("/shipping", async (req, res) => {
   });
 
   const resJson = await response.json();
+
+  channel.sendToQueue("DATA", Buffer.from(JSON.stringify(req.body)));
 
   res.json(resJson);
 });
